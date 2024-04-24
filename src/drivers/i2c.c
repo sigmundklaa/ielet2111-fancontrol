@@ -3,8 +3,6 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#define F_CPU (4000000UL)
-
 #include <avr/interrupt.h>
 #include <avr/io.h>
 #include <util/delay.h>
