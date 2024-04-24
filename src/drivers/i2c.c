@@ -7,7 +7,7 @@
 #include <avr/io.h>
 #include <util/delay.h>
 
-#include "../errno.h"
+#include "../error.h"
 #include "i2c.h"
 
 /**
@@ -122,11 +122,11 @@ static int mset_addr_(volatile TWI_t* twi, uint8_t addr, bool is_read)
                 /* Case M3: Not acknowledged, stop transfer */
                 twi->MCTRLB |= TWI_MCMD_STOP_gc;
 
-                return -ENODEV;
+                return -E_NODEV;
         } else if (twi->MSTATUS & (TWI_BUSERR_bm | TWI_ARBLOST_bm)) {
                 /* Case M4: Arbitration lost/bus error */
 
-                return -EBUSY;
+                return -E_BUSY;
         }
 
         return 0;
@@ -162,9 +162,9 @@ msend_(volatile TWI_t* twi, uint8_t addr, const uint8_t* data, size_t size)
                 if (is_nack_(twi->MSTATUS)) {
                         twi->MCTRLB |= TWI_MCMD_STOP_gc;
 
-                        return -EBUSY;
+                        return -E_BUSY;
                 } else if (twi->MSTATUS & (TWI_BUSERR_bm | TWI_ARBLOST_bm)) {
-                        return -EBUSY;
+                        return -E_BUSY;
                 }
         }
 
@@ -203,7 +203,7 @@ mrecv_(volatile TWI_t* twi, uint8_t addr, uint8_t* buf, size_t max)
                 }
 
                 if (twi->MSTATUS & TWI_WIF_bm) {
-                        return -EIO;
+                        return -E_IO;
                 }
 
                 buf[bytes++] = twi->MDATA;
@@ -262,7 +262,7 @@ static struct ringbuf_ tx_buf_, rx_buf_;
 static int rbuf_write_(struct ringbuf_* rbuf, uint8_t c)
 {
         if (rbuf->length >= sizeof(rbuf->buf)) {
-                return -ENOMEM;
+                return -E_NOMEM;
         }
 
         size_t index = (rbuf->head + rbuf->length) % sizeof(rbuf->buf);
@@ -284,7 +284,7 @@ static int rbuf_write_(struct ringbuf_* rbuf, uint8_t c)
 static int rbuf_read_(struct ringbuf_* rbuf, volatile uint8_t* c)
 {
         if (rbuf->length == 0) {
-                return -ENODATA;
+                return -E_NODATA;
         }
 
         *c = rbuf->buf[rbuf->head];

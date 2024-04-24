@@ -5,7 +5,7 @@
 #include <avr/interrupt.h>
 #include <avr/io.h>
 
-#include "../errno.h"
+#include "../error.h"
 #include "usart.h"
 
 /**
@@ -112,7 +112,7 @@ static int recv_one_(char* c)
         cli();
         if (isr_buf_.len == 0) {
                 sei();
-                return -ENODATA;
+                return -E_NODATA;
         }
 
         uint8_t head = isr_buf_.head;

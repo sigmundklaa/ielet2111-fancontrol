@@ -5,7 +5,7 @@
 #include <avr/interrupt.h>
 
 #include "drivers/usart.h"
-#include "errno.h"
+#include "error.h"
 
 #define BUF_SIZE_ (64)
 #define TERM_CHAR_ ('\r')

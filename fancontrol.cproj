@@ -133,7 +133,10 @@
     <Compile Include="src\drivers\usart.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="src\errno.h">
+    <Compile Include="src\error.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\error.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="src\main.c">
