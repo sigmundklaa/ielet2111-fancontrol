@@ -35,16 +35,6 @@ int main(void)
         uint32_t ticks = 0;
 
         while (1) {
-                if (ticks >= 100000) {
-                        ticks = 0;
-                        i2c_master_send(4, (uint8_t*)"Hello World", 12);
-                        i2c_master_recv(4, buf, 5);
-                        buf[5] = 0;
-                        (void)printf("Receive: %s\r\n", (const char*)buf);
-                }
-
-                ticks++;
-
                 shell_tick();
         }
 }
