@@ -1,6 +1,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include <avr/interrupt.h>
 
@@ -11,6 +12,7 @@
 
 #define BUF_SIZE_ (64)
 #define TERM_CHAR_ ('\r')
+#define DEL_CHAR_ (127)
 
 #define ARR_LEN_(x) (sizeof(x) / sizeof(x[0]))
 
@@ -103,14 +105,21 @@ static int process_cmd_(int argc)
                 }
         }
 
-        return -EINVAL;
+        return -E_NOENT;
 }
 
 void shell_tick(void)
 {
         while (usart_read(sh_buf_.tmpbuf + sh_buf_.tmpidx, 1) > 0) {
                 char c = sh_buf_.tmpbuf[sh_buf_.tmpidx];
-                sh_buf_.tmpidx++;
+                
+                if (c == DEL_CHAR_) {
+                        if (sh_buf_.tmpidx > 0) {
+                                sh_buf_.tmpidx--;       
+                        }
+                } else {
+                        sh_buf_.tmpidx++;       
+                }
 
                 /* Data too long, unable to process it */
                 if (sh_buf_.tmpidx >= sizeof(sh_buf_.tmpbuf)) {
