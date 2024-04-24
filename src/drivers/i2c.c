@@ -209,7 +209,7 @@ mrecv_(volatile TWI_t* twi, uint8_t addr, uint8_t* buf, size_t max)
                 buf[bytes++] = twi->MDATA;
 
                 if (bytes < max) {
-                        twi->MCTRLB |= TWI_MCMD_RECVTRANS_gc;               
+                        twi->MCTRLB |= TWI_MCMD_RECVTRANS_gc;
                 }
         }
 

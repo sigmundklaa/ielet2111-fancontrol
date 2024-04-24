@@ -1,9 +1,9 @@
 
 #include <stdio.h>
 
+#include <avr/eeprom.h>
 #include <avr/interrupt.h>
 #include <avr/io.h>
-#include <avr/eeprom.h>
 #include <util/delay.h>
 
 #include "drivers/i2c.h"

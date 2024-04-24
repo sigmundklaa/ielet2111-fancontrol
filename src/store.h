@@ -18,7 +18,7 @@ void store_init(void);
  * @param field
  * @param value
  */
-#define store_update(field, value) \
+#define store_update(field, value)                                             \
         store_update__(offsetof(struct store, field), value, sizeof(*value))
 
 /**
@@ -27,7 +27,7 @@ void store_init(void);
  * @param field
  * @param buffer
  */
-#define store_read(field, buffer) \
+#define store_read(field, buffer)                                              \
         store_read__(offsetof(struct store, field), buffer, sizeof(*buffer))
 
 /**
@@ -41,9 +41,10 @@ void store_init(void);
  * @brief Get the value stored at store field @p field
  *
  * @param field
- */     
-#define store_get(field) \
-        (*((typeof(((struct store*)NULL)->field)*)store_get__(offsetof(struct store, field))))
+ */
+#define store_get(field)                                                       \
+        (*((typeof(((struct store*)NULL)->field                                \
+        )*)store_get__(offsetof(struct store, field))))
 
 /**
  * @brief Update the value at offset @p addr_offset in the store, writing
@@ -72,7 +73,7 @@ void store_read__(uint16_t addr_offset, void* buf, size_t size);
  * @brief Get the store address pointed to by @p addr_offset
  *
  * NOTE: This function should not be used directly, see `store_get` instead
- * 
+ *
  * @param addr_offset
  * @return void*
  */

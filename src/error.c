@@ -21,6 +21,6 @@ const char* e_str(unsigned int err)
         default:
                 break;
         }
-        
+
         return "Unknown error";
 }

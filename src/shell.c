@@ -1,12 +1,12 @@
 
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include <avr/interrupt.h>
 
-#include "drivers/usart.h"
 #include "drivers/i2c.h"
+#include "drivers/usart.h"
 #include "error.h"
 #include "store.h"
 
@@ -35,14 +35,14 @@ static int i2c_addr_set_(int argc, char** argv)
                 (void)printf("Expected 2 arguments, got %i\r\n", argc);
                 return E_INVAL;
         }
-        
+
         uint8_t addr = atoi(argv[1]);
         store_update(i2c_slave_addr, &addr);
 
         i2c_slave_set_addr(addr);
-        
+
         (void)printf("I2C slave address set to %i\r\n", (int)addr);
-        
+
         return 0;
 }
 
@@ -55,7 +55,12 @@ static struct {
         const char* usage;
 } cmd_lookup_[] = {
     {"hello", say_hello, "Say Hello!", "<your name>"},
-    {"i2c_addr_set", i2c_addr_set_, "Set I2C slave address", "<address>",},
+    {
+        "i2c_addr_set",
+        i2c_addr_set_,
+        "Set I2C slave address",
+        "<address>",
+    },
     {"help", help, "Show helptext", ""},
 };
 
@@ -65,7 +70,8 @@ static int help(int argc, char** argv)
 
         for (size_t i = 0; i < ARR_LEN_(cmd_lookup_); i++) {
                 (void)printf(
-                    "\t%s %s - %s\r\n", cmd_lookup_[i].cmd, cmd_lookup_[i].usage, cmd_lookup_[i].help
+                    "\t%s %s - %s\r\n", cmd_lookup_[i].cmd,
+                    cmd_lookup_[i].usage, cmd_lookup_[i].help
                 );
         }
 
@@ -112,13 +118,13 @@ void shell_tick(void)
 {
         while (usart_read(sh_buf_.tmpbuf + sh_buf_.tmpidx, 1) > 0) {
                 char c = sh_buf_.tmpbuf[sh_buf_.tmpidx];
-                
+
                 if (c == DEL_CHAR_) {
                         if (sh_buf_.tmpidx > 0) {
-                                sh_buf_.tmpidx--;       
+                                sh_buf_.tmpidx--;
                         }
                 } else {
-                        sh_buf_.tmpidx++;       
+                        sh_buf_.tmpidx++;
                 }
 
                 /* Data too long, unable to process it */
@@ -140,8 +146,8 @@ void shell_tick(void)
 
                         if (ret != 0) {
                                 (void)printf(
-                                    "%s: %s\r\n",
-                                    sh_buf_.args[0], e_str(ret < 0 ? -ret : ret)
+                                    "%s: %s\r\n", sh_buf_.args[0],
+                                    e_str(ret < 0 ? -ret : ret)
                                 );
                         }
 
