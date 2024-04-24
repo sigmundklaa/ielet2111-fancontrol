@@ -145,6 +145,12 @@
     <Compile Include="src\shell.c">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="src\store.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\store.h">
+      <SubType>compile</SubType>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="src" />

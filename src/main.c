@@ -3,10 +3,12 @@
 
 #include <avr/interrupt.h>
 #include <avr/io.h>
+#include <avr/eeprom.h>
 #include <util/delay.h>
 
 #include "drivers/i2c.h"
 #include "drivers/usart.h"
+#include "store.h"
 
 extern void shell_tick(void);
 
@@ -19,6 +21,8 @@ int main(void)
 
         /* Setup USART3 controller */
         PORTB.DIR = 1 << 0;
+
+        store_init();
 
         usart_init(&USART3, 9600);
         usart_setup_stdout();
