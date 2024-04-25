@@ -36,14 +36,15 @@ static uint8_t baud_rate_(uint32_t nominal, enum i2c_mode mode)
         tlow = ((base + 5) * 10000000) / F_CPU;
 
         switch (mode) {
-        case I2C_MODE_STANDARD:
-                tlow_mode = 47;
-                break;
         case I2C_MODE_FAST:
                 tlow_mode = 13;
                 break;
         case I2C_MODE_FAST_PLUS:
                 tlow_mode = 5;
+                break;
+        case I2C_MODE_STANDARD:
+        default:
+                tlow_mode = 47;
                 break;
         }
 
