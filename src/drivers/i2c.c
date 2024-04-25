@@ -117,7 +117,7 @@ static void mwait_(volatile TWI_t* twi)
 static int mset_addr_(volatile TWI_t* twi, uint8_t addr, bool is_read)
 {
         twi->MADDR = (addr << 1) | is_read;
-        mwait_(twi);       
+        mwait_(twi);
 
         if (is_nack_(twi->MSTATUS)) {
                 /* Case M3: Not acknowledged, stop transfer */

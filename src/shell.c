@@ -49,7 +49,7 @@ static int i2c_addr_set_(int argc, char** argv)
 static int i2c_addr_get_(int argc, char** argv)
 {
         (void)printf("%i\r\n", (int)store_get(i2c_slave_addr));
-        return 0;        
+        return 0;
 }
 
 static int i2c_temp_addr_set_(int argc, char** argv)
@@ -64,7 +64,7 @@ static int i2c_temp_addr_set_(int argc, char** argv)
 
         (void)printf("I2C temp slave address set to %i\r\n", (int)addr);
 
-        return 0;    
+        return 0;
 }
 
 static int i2c_temp_addr_get_(int argc, char** argv)
@@ -77,13 +77,14 @@ static int temp_(int argc, char** argv)
 {
         (void)argc;
         (void)argv;
-        
+
         uint32_t t = 0;
-        ptrdiff_t status = i2c_master_recv(store_get(i2c_temp_addr), (uint8_t*)&t, sizeof(t));
+        ptrdiff_t status =
+            i2c_master_recv(store_get(i2c_temp_addr), (uint8_t*)&t, sizeof(t));
         if (status != sizeof(t)) {
                 return status < 0 ? -status : E_IO;
         }
-        
+
         (void)printf("Temperature: %imC\r\n", (int)t);
 
         return 0;
@@ -108,7 +109,7 @@ static struct {
         "i2c_addr_get",
         i2c_addr_get_,
         "Get I2C slave address",
-        "",            
+        "",
     },
     {
         "i2c_temp_addr_set",
