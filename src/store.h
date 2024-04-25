@@ -4,6 +4,7 @@
 
 struct store {
         uint8_t i2c_slave_addr;
+        uint8_t i2c_temp_addr;
 };
 
 /**

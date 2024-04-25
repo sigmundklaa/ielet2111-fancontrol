@@ -8,6 +8,7 @@
 static struct store store_ = {
     /* Default values, will be overwritten */
     .i2c_slave_addr = 9,
+    .i2c_temp_addr = 5,
 };
 
 /**
