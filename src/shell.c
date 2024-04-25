@@ -120,7 +120,7 @@ static struct {
     {
         "i2c_temp_addr_get",
         i2c_temp_addr_get_,
-        "Set I2C temperature slave address",
+        "Get I2C temperature slave address",
         "<address>",
     },
     {
