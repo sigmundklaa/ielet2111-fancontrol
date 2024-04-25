@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <avr/io.h>
 #include <avr/interrupt.h>
 
 #include "drivers/i2c.h"
@@ -90,6 +91,15 @@ static int temp_(int argc, char** argv)
         return 0;
 }
 
+static int reboot_(int argc, char** argv)
+{
+        (void)argc;
+        (void)argv;
+        
+        RSTCTRL.SWRR = RSTCTRL_SWRST_bm;
+        return 0;
+}
+
 static int help(int argc, char** argv);
 
 static struct {
@@ -127,6 +137,12 @@ static struct {
         "temp",
         temp_,
         "Get temperature (in mC)",
+        "",
+    },
+    {
+        "reboot",
+        reboot_,
+        "Reboot the MCU",
         "",
     },
     {"help", help, "Show helptext", ""},
