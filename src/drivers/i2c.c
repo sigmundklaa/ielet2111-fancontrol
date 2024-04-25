@@ -98,8 +98,8 @@ static void msetup_(volatile TWI_t* twi, uint32_t speed, enum i2c_mode mode)
  */
 static void mwait_(volatile TWI_t* twi)
 {
-        /* Case M1, M3 and M4 will set WIF. M1, M2 and M3 set CLKHOLD */
-        while (!(twi->MSTATUS & (TWI_WIF_bm | TWI_CLKHOLD_bm))) {
+        /* Case M1, M3 and M4 will set WIF. M2 sets RIF */
+        while (!(twi->MSTATUS & (TWI_WIF_bm | TWI_RIF_bm))) {
         }
 }
 
@@ -117,7 +117,7 @@ static void mwait_(volatile TWI_t* twi)
 static int mset_addr_(volatile TWI_t* twi, uint8_t addr, bool is_read)
 {
         twi->MADDR = (addr << 1) | is_read;
-        mwait_(twi);
+        mwait_(twi);       
 
         if (is_nack_(twi->MSTATUS)) {
                 /* Case M3: Not acknowledged, stop transfer */
@@ -198,10 +198,7 @@ mrecv_(volatile TWI_t* twi, uint8_t addr, uint8_t* buf, size_t max)
         }
 
         while (bytes < max) {
-                /* On receive, RIF and CLKHOLD are set to 1. On error, WIF is
-                 * set to 1*/
-                while (!(twi->MSTATUS & (TWI_CLKHOLD_bm | TWI_WIF_bm))) {
-                }
+                mwait_(twi);
 
                 if (twi->MSTATUS & TWI_WIF_bm) {
                         return -E_IO;
