@@ -3,8 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <avr/io.h>
 #include <avr/interrupt.h>
+#include <avr/io.h>
 
 #include "drivers/i2c.h"
 #include "drivers/usart.h"
@@ -95,7 +95,7 @@ static int reboot_(int argc, char** argv)
 {
         (void)argc;
         (void)argv;
-        
+
         RSTCTRL.SWRR = RSTCTRL_SWRST_bm;
         return 0;
 }
