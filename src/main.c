@@ -13,6 +13,7 @@
 #include "store.h"
 
 extern void shell_tick(void);
+extern void fan_tick(void);
 
 int main(void)
 {
@@ -39,5 +40,6 @@ int main(void)
         while (1) {
                 shell_tick();
                 cmd_tick();
+				fan_tick();
         }
 }

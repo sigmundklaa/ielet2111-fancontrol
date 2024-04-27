@@ -150,28 +150,41 @@ for the higher byte */
 
         TCA1.SPLIT.HPER = PERIOD;
         TCA1.SPLIT.HCMP0 = fanspeed_8;
+		TCA1.SPLIT.DBGCTRL = 1;
 
         TCA1.SPLIT.CTRLA = TCA_SPLIT_CLKSEL_DIV16_gc /* set clock source
         (sys_clk/16) */
                            | TCA_SPLIT_ENABLE_bm;    /* start timer */
 }
 
+static uint8_t current_tacho_pin = 0;
+
 // TCB0 interrupt routine
 ISR(TCB0_INT_vect)
 {
-        static uint8_t current_tacho_pin = 0;
-        uint8_t next_tacho_pin = (current_tacho_pin + 1) % 8;
-
         pulse[current_tacho_pin] =
             TCB0.CCMP; // Store the new capture value for the current tacho pin
 
         rpm[current_tacho_pin] =
-            ((1000000000UL) / (pulse[current_tacho_pin] * 250 * 2)) * 60;
+            ((1000000000UL) / (pulse[current_tacho_pin] * 200 * 2)) * 60;
+}
 
-        // Switch to the next tacho pin
-        EVSYS.CHANNEL2 = EVSYS_CHANNEL2_PORTC_PIN0_gc + next_tacho_pin;
+void fan_tick(void)
+{
+		static int ticks = 0;
+	
+		if (++ticks < 10000) {
+				return;
+		}
+	
+		ticks = 0;
+	
+		uint8_t next_tacho_pin = (current_tacho_pin + 1) % 8;
 
-        current_tacho_pin = next_tacho_pin;
+		// Switch to the next tacho pin
+		EVSYS.CHANNEL2 = EVSYS_CHANNEL2_PORTC_PIN0_gc + next_tacho_pin;
+		//
+		current_tacho_pin = next_tacho_pin;
 }
 
 void fan_init(void)
@@ -215,6 +228,7 @@ void fan_set_speed(uint8_t fan_index, const char* speed)
 {
         int duty_cycle = off;
         register8_t* reg = NULL;
+		
 
         if (strcmp(speed, "max") == 0) {
                 duty_cycle = max;
@@ -230,7 +244,7 @@ void fan_set_speed(uint8_t fan_index, const char* speed)
         }
 
         fan_speeds[fan_index] = duty_cycle;
-        *reg = (uint8_t)duty_cycle;
+        *reg = (uint8_t)((9*duty_cycle)/100);
 }
 
 uint16_t fan_get_speed(uint8_t fan_index)
