@@ -34,5 +34,4 @@ void fan_set_speed(uint8_t fan_index, const char* speed);
  */
 uint16_t fan_get_speed(uint8_t fan_index);
 
-
 #endif /* FAN_H__ */

@@ -6,11 +6,11 @@
 #include <avr/io.h>
 #include <util/delay.h>
 
+#include "cmd.h"
 #include "drivers/i2c.h"
 #include "drivers/usart.h"
 #include "fan.h"
 #include "store.h"
-#include "cmd.h"
 
 extern void shell_tick(void);
 
@@ -32,7 +32,7 @@ int main(void)
         fan_init();
 
         i2c_master_init(100000, I2C_MODE_STANDARD);
-        
+
         i2c_slave_init(store_get(i2c_slave_addr));
         sei();
 

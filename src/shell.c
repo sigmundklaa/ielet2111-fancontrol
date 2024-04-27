@@ -9,8 +9,8 @@
 #include "drivers/i2c.h"
 #include "drivers/usart.h"
 #include "error.h"
-#include "store.h"
 #include "fan.h"
+#include "store.h"
 
 #define BUF_SIZE_ (64)
 #define TERM_CHAR_ ('\r')
@@ -94,9 +94,9 @@ static int temp_(int argc, char** argv)
 
 static int fan_invalid_(uint8_t index)
 {
-     (void)printf("Invalid fan %i, valid range is 0-7\r\n", (int)index);
-     
-     return -E_INVAL;   
+        (void)printf("Invalid fan %i, valid range is 0-7\r\n", (int)index);
+
+        return -E_INVAL;
 }
 
 static int fanctrl_(int argc, char** argv)
@@ -105,22 +105,22 @@ static int fanctrl_(int argc, char** argv)
                 (void)printf("Expected 3 arguments, got %i\r\n", argc);
                 return -E_INVAL;
         }
-        
+
         uint8_t index = atoi(argv[1]);
         const char* speed = argv[2];
-        
+
         /* Ensure we actually have a valid key, aswell as a null terminator */
         if (strnlen(speed, 10) >= 10) {
                 (void)printf("Invalid speed\r\n");
-                
+
                 return -E_INVAL;
         }
         if (index >= 8) {
                 return fan_invalid_(index);
         }
-        
+
         (void)fan_set_speed(index, speed);
-        
+
         return 0;
 }
 
@@ -130,24 +130,24 @@ static int fancheck_(int argc, char** argv)
                 for (uint8_t i = 0; i < 8; i++) {
                         fan_check_speed(i);
                 }
-                
+
                 return 0;
         }
-        
+
         uint8_t index = atoi(argv[1]);
         if (index >= 8) {
                 return fan_invalid_(index);
         }
-        
+
         fan_check_speed(index);
-        
+
         return 0;
 }
 
 static void fanspeed_one_(uint8_t index)
 {
         uint16_t speed = fan_get_speed(index);
-        
+
         (void)printf("Fan %i speed: %i RPM\r\n", (int)index, (int)speed);
 }
 
@@ -157,17 +157,17 @@ static int fanspeed_(int argc, char** argv)
                 for (uint8_t i = 0; i < 8; i++) {
                         fanspeed_one_(i);
                 }
-                
+
                 return 0;
         }
-        
+
         uint8_t index = atoi(argv[1]);
         if (index >= 8) {
                 return fan_invalid_(index);
         }
-        
+
         fanspeed_one_(index);
-        
+
         return 0;
 }
 

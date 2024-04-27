@@ -300,7 +300,7 @@ static int rbuf_read_(struct ringbuf_* rbuf, volatile uint8_t* c)
 static void sisr_handle_(volatile TWI_t* twi)
 {
         uint8_t sstatus = twi->SSTATUS;
-        
+
         if (sstatus & TWI_DIF_bm) {
                 int status;
                 if (!(sstatus & TWI_DIR_bm)) {
@@ -310,12 +310,12 @@ static void sisr_handle_(volatile TWI_t* twi)
                         /* Transmit direction */
                         if (is_nack_(sstatus)) {
                                 /* Unable to read more */
-                                twi->SCTRLB = TWI_ACKACT_ACK_gc |
-                                              TWI_SCMD_RESPONSE_gc;
+                                twi->SCTRLB =
+                                    TWI_ACKACT_ACK_gc | TWI_SCMD_RESPONSE_gc;
 
                                 return;
                         }
-                        
+
                         status = rbuf_read_(&tx_buf_, &twi->SDATA);
                 }
 
@@ -328,12 +328,13 @@ static void sisr_handle_(volatile TWI_t* twi)
                 twi->SCTRLB |= TWI_SCMD_RESPONSE_gc;
                 return;
         }
-        
+
         if (sstatus & TWI_APIF_bm) {
                 if (sstatus & TWI_AP_ADR_gc) {
                         twi->SCTRLB = TWI_ACKACT_ACK_gc | TWI_SCMD_RESPONSE_gc;
                 } else {
-                        twi->SCTRLB = TWI_ACKACT_NACK_gc | TWI_SCMD_COMPTRANS_gc;
+                        twi->SCTRLB =
+                            TWI_ACKACT_NACK_gc | TWI_SCMD_COMPTRANS_gc;
                 }
         }
 }
