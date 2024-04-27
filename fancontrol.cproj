@@ -145,6 +145,12 @@
     <Compile Include="src\error.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="src\fan.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\fan.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="src\main.c">
       <SubType>compile</SubType>
     </Compile>
