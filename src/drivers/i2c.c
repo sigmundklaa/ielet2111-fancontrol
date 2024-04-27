@@ -299,29 +299,41 @@ static int rbuf_read_(struct ringbuf_* rbuf, volatile uint8_t* c)
  */
 static void sisr_handle_(volatile TWI_t* twi)
 {
-        if (twi->SSTATUS & TWI_DIF_bm) {
+        uint8_t sstatus = twi->SSTATUS;
+        
+        if (sstatus & TWI_DIF_bm) {
                 int status;
-                if (twi->SSTATUS & TWI_DIR_bm) {
-                        /* Transmit direction */
-                        status = rbuf_read_(&tx_buf_, &twi->SDATA);
-                } else {
+                if (!(sstatus & TWI_DIR_bm)) {
                         /* Receive direction */
                         status = rbuf_write_(&rx_buf_, twi->SDATA);
+                } else {
+                        /* Transmit direction */
+                        if (is_nack_(sstatus)) {
+                                /* Unable to read more */
+                                twi->SCTRLB = TWI_ACKACT_ACK_gc |
+                                              TWI_SCMD_RESPONSE_gc;
+
+                                return;
+                        }
+                        
+                        status = rbuf_read_(&tx_buf_, &twi->SDATA);
                 }
 
                 if (status != 0) {
-                        twi->SCTRLB |= TWI_ACKACT_NACK_gc;
+                        twi->SCTRLB = TWI_ACKACT_NACK_gc;
+                } else {
+                        twi->SCTRLB = TWI_ACKACT_ACK_gc;
                 }
 
                 twi->SCTRLB |= TWI_SCMD_RESPONSE_gc;
+                return;
         }
-
-        if (twi->SSTATUS & TWI_APIF_bm) {
-                if (twi->SSTATUS & TWI_AP_ADR_gc) {
+        
+        if (sstatus & TWI_APIF_bm) {
+                if (sstatus & TWI_AP_ADR_gc) {
                         twi->SCTRLB = TWI_ACKACT_ACK_gc | TWI_SCMD_RESPONSE_gc;
                 } else {
-                        twi->SCTRLB = TWI_ACKACT_NACK_gc;
-                        twi->SCTRLB |= TWI_SCMD_COMPTRANS_gc;
+                        twi->SCTRLB = TWI_ACKACT_NACK_gc | TWI_SCMD_COMPTRANS_gc;
                 }
         }
 }
