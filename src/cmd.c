@@ -2,6 +2,7 @@
 #include <stdio.h>
 
 #include "drivers/i2c.h"
+#include "fan.h"
 
 struct __attribute__((packed)) cmd_packet_ {
         uint8_t cmd;
@@ -20,6 +21,15 @@ typedef int (*cmd_fn_)(struct cmd_packet_* packet);
 
 static int report_(struct cmd_packet_* packet)
 {
+        for (uint8_t i = 0; i < 8; i++) {
+                uint16_t speed = fan_get_speed(i);
+                
+                (void)memcpy(packet->args + i * sizeof(speed), &speed,
+                             sizeof(speed));
+        }
+        
+        (void)i2c_slave_send(packet->args, sizeof(uint16_t) * 8);
+        
         return 0;
 }
 
