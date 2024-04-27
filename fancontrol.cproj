@@ -121,6 +121,12 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="src\cmd.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="src\cmd.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="src\drivers\i2c.c">
       <SubType>compile</SubType>
     </Compile>

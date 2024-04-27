@@ -9,6 +9,7 @@
 #include "drivers/i2c.h"
 #include "drivers/usart.h"
 #include "store.h"
+#include "cmd.h"
 
 extern void shell_tick(void);
 
@@ -36,5 +37,6 @@ int main(void)
 
         while (1) {
                 shell_tick();
+                cmd_tick();
         }
 }
