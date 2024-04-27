@@ -8,6 +8,7 @@
 
 #include "drivers/i2c.h"
 #include "drivers/usart.h"
+#include "fan.h"
 #include "store.h"
 #include "cmd.h"
 
@@ -28,12 +29,12 @@ int main(void)
         usart_init(&USART3, 9600);
         usart_setup_stdout();
 
+        fan_init();
+
         i2c_master_init(100000, I2C_MODE_STANDARD);
+        
         i2c_slave_init(store_get(i2c_slave_addr));
         sei();
-
-        uint8_t buf[100];
-        uint32_t ticks = 0;
 
         while (1) {
                 shell_tick();
