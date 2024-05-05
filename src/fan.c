@@ -95,8 +95,8 @@ void TCB_init(void)
                      TCB_CCMPEN_bm; // Set TCB to frequency measurement mode and
                                     // enable Compare/Capture output
         TCB0.CCMP = 0xFFFF;         // Set TOP value to maximum
-        TCB0.EVCTRL = TCB_CAPTEI_bm; // Enable event input
-        TCB0.INTCTRL = TCB_CAPT_bm;  // Enable capture interrupt
+        TCB0.EVCTRL = TCB_CAPTEI_bm;                 // Enable event input
+        TCB0.INTCTRL = TCB_CAPT_bm;                  // Enable capture interrupt
         EVSYS.USERTCB0CAPT = EVSYS_USER_CHANNEL2_gc; // Initialize channel 2
         EVSYS.CHANNEL2 =
             EVSYS_CHANNEL2_PORTC_PIN0_gc; // Capture first tacho pin
@@ -113,9 +113,9 @@ void TCA0_init(void)
 
         /* enable compare channel */
         TCA0.SPLIT.CTRLB = TCA_SPLIT_HCMP0EN_bm | TCA_SPLIT_HCMP1EN_bm |
-                           TCA_SPLIT_HCMP2EN_bm //higher byte
+                           TCA_SPLIT_HCMP2EN_bm // higher byte
                            | TCA_SPLIT_LCMP0EN_bm | TCA_SPLIT_LCMP1EN_bm |
-                           TCA_SPLIT_LCMP2EN_bm; //lower byte
+                           TCA_SPLIT_LCMP2EN_bm; // lower byte
 
         /* set the PWM frequencies and duty cycles */
         TCA0.SPLIT.LPER = PERIOD;
@@ -154,7 +154,7 @@ for the higher byte */
 
         TCA1.SPLIT.HPER = PERIOD;
         TCA1.SPLIT.HCMP0 = fanspeed_8;
-		TCA1.SPLIT.DBGCTRL = 1;
+        TCA1.SPLIT.DBGCTRL = 1;
 
         TCA1.SPLIT.CTRLA = TCA_SPLIT_CLKSEL_DIV16_gc /* set clock source
         (sys_clk/16) */
@@ -176,20 +176,20 @@ ISR(TCB0_INT_vect)
 
 void fan_tick(void)
 {
-		static int ticks = 0;
-                /* Short delay to reduce errors when switching */
-		if (++ticks < 10000) {
-				return;
-		}
-	
-		ticks = 0;
+        static int ticks = 0;
+        /* Short delay to reduce errors when switching */
+        if (++ticks < 10000) {
+                return;
+        }
 
-                /* Looping through pins */
-		uint8_t next_tacho_pin = (current_tacho_pin + 1) % 8;
+        ticks = 0;
 
-		// Switch to the next tacho pin
-		EVSYS.CHANNEL2 = EVSYS_CHANNEL2_PORTC_PIN0_gc + next_tacho_pin;
-		current_tacho_pin = next_tacho_pin;
+        /* Looping through pins */
+        uint8_t next_tacho_pin = (current_tacho_pin + 1) % 8;
+
+        // Switch to the next tacho pin
+        EVSYS.CHANNEL2 = EVSYS_CHANNEL2_PORTC_PIN0_gc + next_tacho_pin;
+        current_tacho_pin = next_tacho_pin;
 }
 
 void fan_init(void)
@@ -213,7 +213,7 @@ void fan_check_speed(uint8_t fan_index)
         } else {
                 threshold = SUPPOSED_OFF_RPM;
         }
-        
+
         /* Check if speed is too low (1500 under supposed rpm) */
         if (rpm[fan_index] < threshold - 1500) {
                 printf(
@@ -227,7 +227,6 @@ void fan_set_speed(uint8_t fan_index, const char* speed)
 {
         int duty_cycle = off;
         register8_t* reg = NULL;
-		
 
         if (strcmp(speed, "max") == 0) {
                 duty_cycle = max;
@@ -243,7 +242,7 @@ void fan_set_speed(uint8_t fan_index, const char* speed)
         }
 
         fan_speeds[fan_index] = duty_cycle;
-        *reg = (uint8_t)((9*duty_cycle)/100);
+        *reg = (uint8_t)((9 * duty_cycle) / 100);
 }
 
 uint16_t fan_get_speed(uint8_t fan_index)
