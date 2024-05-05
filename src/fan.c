@@ -6,7 +6,7 @@
 
 #define TCB_INSTANCE TCB0
 
-/*fan modes/percentages*/
+/*fan modes/PWM duty cycle percentages*/
 #define off (0)
 #define low (40)
 #define medium (70)
@@ -20,9 +20,12 @@ static const int SUPPOSED_MAX_RPM = 13100;
 
 static uint32_t pulse[8]; // Array to store the pulse values for 8 fans
 static uint32_t rpm[8];   // Array to store the RPM values for 8 fans
-/*PB0, PB1, PB2, PB3, PB4, PB5, PD2, PD3*/
+
+/*All fans are set to low at initialisation*/
+/*PD0, PD1, PD2, PD3, PD4, PD5, PB2, PB3*/
 static int fan_speeds[] = {low, low, low, low, low, low, low, low};
 
+/*Definition/calculation of fan value*/
 #define PERIOD (9)
 #define fanspeed_1 ((9 / 100.0) * fan_speeds[0])
 #define fanspeed_2 ((9 / 100.0) * fan_speeds[1])
@@ -83,7 +86,7 @@ void PORT_init(void)
         PORTC.PIN7CTRL |= PORT_PULLUPEN_bm;
 }
 
-// Initialize TCB for frequency measurement
+/*TCB for frequency measurement*/
 void TCB_init(void)
 {
         TCB0.CTRLA = TCB_CLKSEL_DIV1_gc |
@@ -94,11 +97,12 @@ void TCB_init(void)
         TCB0.CCMP = 0xFFFF;         // Set TOP value to maximum
         TCB0.EVCTRL = TCB_CAPTEI_bm; // Enable event input
         TCB0.INTCTRL = TCB_CAPT_bm;  // Enable capture interrupt
-        EVSYS.USERTCB0CAPT = EVSYS_USER_CHANNEL2_gc;
+        EVSYS.USERTCB0CAPT = EVSYS_USER_CHANNEL2_gc; // Initialize channel 2
         EVSYS.CHANNEL2 =
-            EVSYS_CHANNEL2_PORTC_PIN0_gc; // Change to the first tacho pin
+            EVSYS_CHANNEL2_PORTC_PIN0_gc; // Capture first tacho pin
 }
 
+/*TCA0 for control of pins PD0, PD1, PD2, PD3, PD4, PD5*/
 void TCA0_init(void)
 {
         /* set waveform output on PORT A */
@@ -107,12 +111,11 @@ void TCA0_init(void)
         /* enable split mode */
         TCA0.SPLIT.CTRLD = TCA_SPLIT_SPLITM_bm;
 
+        /* enable compare channel */
         TCA0.SPLIT.CTRLB = TCA_SPLIT_HCMP0EN_bm | TCA_SPLIT_HCMP1EN_bm |
-                           TCA_SPLIT_HCMP2EN_bm /* enable compare channel
-for the higher byte */
+                           TCA_SPLIT_HCMP2EN_bm //higher byte
                            | TCA_SPLIT_LCMP0EN_bm | TCA_SPLIT_LCMP1EN_bm |
-                           TCA_SPLIT_LCMP2EN_bm; /* enable compare channel
-for the lower byte */
+                           TCA_SPLIT_LCMP2EN_bm; //lower byte
 
         /* set the PWM frequencies and duty cycles */
         TCA0.SPLIT.LPER = PERIOD;
@@ -130,6 +133,7 @@ for the lower byte */
                            | TCA_SPLIT_ENABLE_bm;    /* start timer */
 }
 
+/*TCA1 for control of pins PB2, PB3*/
 void TCA1_init(void)
 {
         /* set waveform output on PORT A */
@@ -189,7 +193,7 @@ void fan_tick(void)
 
 void fan_init(void)
 {
-        TCB_init(); // Initialize TCB
+        TCB_init();
         PORT_init();
         TCA1_init();
         TCA0_init();
@@ -198,14 +202,7 @@ void fan_init(void)
 void fan_check_speed(uint8_t fan_index)
 {
         int threshold;
-
-        /* debug
-        printf("Fan RPM: %d\r\n", (int)fan_speeds[fan_index]);
-        printf("max: %d\r\n", max);
-        printf("medium: %d\r\n", medium);
-        printf("low: %d\r\n", low);
-        */
-
+        
         if (fan_speeds[fan_index] == max) {
                 threshold = SUPPOSED_MAX_RPM;
         } else if (fan_speeds[fan_index] == medium) {
