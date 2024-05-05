@@ -40,6 +40,6 @@ int main(void)
         while (1) {
                 shell_tick();
                 cmd_tick();
-				fan_tick();
+                fan_tick();
         }
 }
