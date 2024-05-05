@@ -154,7 +154,7 @@ for the higher byte */
 
         TCA1.SPLIT.HPER = PERIOD;
         TCA1.SPLIT.HCMP0 = fanspeed_8;
-        TCA1.SPLIT.DBGCTRL = 1;
+		TCA1.SPLIT.DBGCTRL = 1;
 
         TCA1.SPLIT.CTRLA = TCA_SPLIT_CLKSEL_DIV16_gc /* set clock source
         (sys_clk/16) */
@@ -169,25 +169,27 @@ ISR(TCB0_INT_vect)
         pulse[current_tacho_pin] =
             TCB0.CCMP; // Store the new capture value for the current tacho pin
 
+        /* Calculate corresponding rpm */
         rpm[current_tacho_pin] =
             ((1000000000UL) / (pulse[current_tacho_pin] * 200 * 2)) * 60;
 }
 
 void fan_tick(void)
 {
-        static int ticks = 0;
+		static int ticks = 0;
+                /* Short delay to reduce errors when switching */
+		if (++ticks < 10000) {
+				return;
+		}
+	
+		ticks = 0;
 
-        if (++ticks < 10000) {
-                return;
-        }
+                /* Looping through pins */
+		uint8_t next_tacho_pin = (current_tacho_pin + 1) % 8;
 
-        ticks = 0;
-
-        uint8_t next_tacho_pin = (current_tacho_pin + 1) % 8;
-
-        // Switch to the next tacho pin
-        EVSYS.CHANNEL2 = EVSYS_CHANNEL2_PORTC_PIN0_gc + next_tacho_pin;
-        current_tacho_pin = next_tacho_pin;
+		// Switch to the next tacho pin
+		EVSYS.CHANNEL2 = EVSYS_CHANNEL2_PORTC_PIN0_gc + next_tacho_pin;
+		current_tacho_pin = next_tacho_pin;
 }
 
 void fan_init(void)
@@ -201,7 +203,7 @@ void fan_init(void)
 void fan_check_speed(uint8_t fan_index)
 {
         int threshold;
-        
+        /* Check speed setting */
         if (fan_speeds[fan_index] == max) {
                 threshold = SUPPOSED_MAX_RPM;
         } else if (fan_speeds[fan_index] == medium) {
@@ -211,7 +213,8 @@ void fan_check_speed(uint8_t fan_index)
         } else {
                 threshold = SUPPOSED_OFF_RPM;
         }
-
+        
+        /* Check if speed is too low (1500 under supposed rpm) */
         if (rpm[fan_index] < threshold - 1500) {
                 printf(
                     "Error: Fan speed %d is too low, should be: %d\r\n",
@@ -224,6 +227,7 @@ void fan_set_speed(uint8_t fan_index, const char* speed)
 {
         int duty_cycle = off;
         register8_t* reg = NULL;
+		
 
         if (strcmp(speed, "max") == 0) {
                 duty_cycle = max;
@@ -239,7 +243,7 @@ void fan_set_speed(uint8_t fan_index, const char* speed)
         }
 
         fan_speeds[fan_index] = duty_cycle;
-        *reg = (uint8_t)((9 * duty_cycle) / 100);
+        *reg = (uint8_t)((9*duty_cycle)/100);
 }
 
 uint16_t fan_get_speed(uint8_t fan_index)
